@@ -10,6 +10,7 @@ package Alien::Package;
 use strict;
 use vars qw($AUTOLOAD);
 our $verbose=0;
+our $reloc_root;
 
 =head1 DESCRIPTION
 
@@ -354,6 +355,20 @@ sub AUTOLOAD {
 }
 
 =back
+
+=head1 CLASS DATA
+
+=over 4
+
+=item $Alien::Package::reloc_root
+
+If set, the files in a .pkg that are relocatable will be placed under the 
+specified path. If unset, a default path will be used. This is specific to
+converting from the .pkg format.
+
+=back
+
+=head1 CLASS METHODS
 
 =head1 CLASS DATA
 

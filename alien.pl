@@ -191,6 +191,12 @@ some things to mess with their permissions and owners to the degree this does,
 so it defaults to off. This can only be used when converting to debian
 packages.
 
+=item B<--reloc_root=>I<root>
+
+Place relocatable files into "root" instead of /var/lib/dpkg/alien/{Pakcage Name}.
+This is specific to converting from .pkg. If a location is not specified then /
+is assumed.
+
 =item B<-v>, B<--verbose>
 
 Be verbose: Display each command B<alien> runs in the process of converting a
@@ -375,6 +381,7 @@ GetOptions(
 	"description=s"  => \$tgzdescription,
 	"V"              => \&version,
         "version:s"      => sub { length $_[1] ? $tgzversion=$_[1] : version() },
+	"reloc_root:s"   => sub { $Alien::Package::reloc_root=($_[1] ne '') ? $_[1] : '/'; },
 	"verbose|v"      => \$Alien::Package::verbose,
 	"veryverbose"    => sub { $Alien::Package::verbose=2 },
 	"keep-version|k" => \$keepversion,

@@ -293,8 +293,10 @@ sub prep {
 	my $this=shift;
 	my $dir=$this->unpacked_tree || die "The package must be unpacked first!";
 
-	$this->do("mkdir $dir/debian") ||
-		die "mkdir $dir/debian failed: $!";
+	if (! -d "$dir/debian") {
+		$this->do("mkdir $dir/debian") ||
+			die "mkdir $dir/debian failed: $!";
+	}
 	
 	# Use a patch file to debianize?
 	if (defined $this->patchfile) {
@@ -379,7 +381,7 @@ sub prep {
 	open (OUT, ">$dir/debian/rules") || die "$dir/debian/rules: $!";
 	my $fixpermscomment = $this->fixperms ? "" : "#";
 	print OUT << "EOF";
-#!/usr/bin/make -f
+#!/usr/local/bin/gmake -f
 # debian/rules for alien
 
 # Uncomment this to turn on verbose mode.
@@ -410,7 +412,8 @@ binary-arch: build
 	dh_installchangelogs
 
 # Copy the packages's files.
-	find . -maxdepth 1 -mindepth 1 -not -name debian -print0 | \\
+	find . -maxdepth 1 -mindepth 1 -not -name .svn \\
+		-not -name debian -print0 | \\
 		xargs -0 -r -i cp -a {} debian/\$(PACKAGE)
 
 #
@@ -482,9 +485,11 @@ sub build {
 	my $this=shift;
 
 	chdir $this->unpacked_tree;
-	my $log=$this->runpipe(1, "debian/rules binary 2>&1");
+	my $log=$this->runpipe(1, "make -f debian/rules binary 2>&1");
 	if ($?) {
-		die "Package build failed. Here's the log:\n", $log;
+		die "Package build failed. Here's the log:\n", $log
+			if (defined $log);
+		die "Package build failed unexpectedly";
 	}
 	chdir "..";
 
@@ -676,7 +681,7 @@ sub email {
 		close MAILNAME;
 	}
 	if (!$mailname) {
-		$mailname=$this->runpipe(1, "hostname -f");
+		$mailname=$this->runpipe(1, "hostname");
 		chomp $mailname;
 	}
 	return "$login\@$mailname";

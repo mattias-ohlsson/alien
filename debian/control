@@ -8,7 +8,7 @@ Standards-Version: 3.6.2
 Package: alien
 Architecture: all
 Section: admin
-Depends: debhelper (>= 3), ${misc:Depends}, ${perl:Depends}, rpm (>= 2.4.4-2), dpkg-dev, make, cpio
+Depends: debhelper (>= 3), ${misc:Depends}, ${perl:Depends}, dpkg-dev, make, cpio, sunwpkgcmdsu (>= 1.00-2), sunwxcu4
 Suggests: patch, bzip2, lsb-rpm, lintian
 Description: install non-native packages with dpkg
  Alien allows you to convert LSB, Red Hat, Stampede and Slackware Packages

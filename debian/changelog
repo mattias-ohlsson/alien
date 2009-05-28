@@ -1,3 +1,89 @@
+alien (8.73.5) elatte; urgency=low
+
+  * rpm deps disabled for now
+
+ -- Erast Benson <erast@gnusolaris.org>  Sat, 14 Jun 2008 11:06:56 -0700
+
+alien (8.73.4) elatte; urgency=low
+
+  * fix for sunwxvmr package
+
+ -- Super-User <root@myhost>  Sat,  2 Feb 2008 19:51:46 -1100
+
+alien (8.73.3) elatte; urgency=low
+
+  * better vers. detection for COMSTAR package
+
+ -- Super-User <root@myhost>  Sat, 29 Dec 2007 12:19:18 -0700
+
+alien (8.73.2) elatte; urgency=low
+
+  * Make reloc_root take an argument for the path to graft on to
+
+ -- Tim Spriggs <tim@tajinc.org>  Sun,  2 Dec 2007 21:43:49 -0800
+
+alien (8.73.1) elatte; urgency=low
+
+  * Support REV= in CSW packages
+  * Silently pass files of type conf/init in packages
+
+ -- Tim Spriggs <tim@tajinc.org>  Sat,  1 Dec 2007 22:10:49 -0800
+
+alien (8.73) elatte; urgency=low
+
+  * Fix package version detection for 48% of CSW packages
+  * Add --reloc_root option to place files in default location (fixes csw conversion)
+
+ -- Tim Spriggs <tim@tajinc.org>  Fri, 30 Nov 2007 15:18:08 -0800
+
+alien (8.72) elatte; urgency=low
+
+  * minor fix
+
+ -- Erast Benson <erast@gnusolaris.org>  Fri, 23 Feb 2007 17:49:40 -0800
+
+alien (8.71) elatte; urgency=low
+
+  *  support for package relocation
+
+ -- Erast Benson <erast@gnusolaris.org>  Fri, 23 Feb 2007 00:50:27 -0800
+
+alien (8.70) elatte; urgency=low
+
+  * fixed bug introduced by pkg-get (reported by Martti Hamunen)
+
+ -- Erast Benson <erast@gnusolaris.org>  Mon, 27 Nov 2006 18:29:39 -0800
+
+alien (8.69) elatte; urgency=low
+
+  * SVR4 architecture detection fix
+
+ -- Erast Benson <erast@gnusolaris.org>  Thu,  9 Nov 2006 16:03:11 -0800
+
+alien (8.68) elatte; urgency=low
+
+  * added support for SVR4 special classes
+
+ -- Erast Benson <erast@gnusolaris.org>  Thu,  9 Nov 2006 13:41:21 -0800
+
+alien (8.67) elatte; urgency=low
+
+  * SVR4 version parsing fixes
+
+ -- Erast Benson <erast@gnusolaris.org>  Fri,  3 Nov 2006 22:19:28 -0800
+
+alien (8.66) elatte; urgency=low
+
+  * enable SUN_PERSONALITY usage
+
+ -- Super-User <joeyh@debian.org>  Sat, 23 Sep 2006 23:34:24 -0700
+
+alien (8.65) elatte; urgency=low
+
+  * SVR4 class conversion improvements
+
+ -- Super-User <joeyh@debian.org>  Fri, 22 Sep 2006 12:15:51 -0700
+
 alien (8.64) unstable; urgency=low
 
   * Minor improvement to usage message as reported in [some random blog

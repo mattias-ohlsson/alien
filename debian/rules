@@ -31,6 +31,7 @@ binary-indep: build
 	dh_installdocs README gendiff.txt
 	dh_installexamples
 	dh_installchangelogs
+	find debian/alien -name "*.svn*" | xargs rm -rf
 	dh_compress
 	dh_fixperms
 	dh_perl
