@@ -1,54 +1,20 @@
 #!/usr/bin/make -f
+%:
+	dh $@
 
-build: build-stamp
-build-stamp:
-	dh_testdir
-	perl Makefile.PL
-	$(MAKE)
+override_dh_auto_test:
 	# simple smoke test
 	./alien.pl -V
-	touch build-stamp
 
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	perl Makefile.PL
-	-$(MAKE) realclean
-	dh_clean
-
-binary-arch: build
-
-binary-indep: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
+override_dh_auto_install:
 	$(MAKE) pure_install INSTALLDIRS=vendor \
 		PREFIX=$(shell pwd)/debian/alien/$(shell perl -MConfig -e 'print $$Config{prefix}') \
 		VARPREFIX=$(shell pwd)/debian/alien
-	# Why does it make this empty directory? Sigh.
-	rm -rf debian/alien/usr/lib
-	dh_installdocs README gendiff.txt
-	dh_installexamples
-	dh_installchangelogs
-	find debian/alien -name "*.svn*" | xargs rm -rf
-	dh_compress
-	dh_fixperms
-	dh_perl
-	dh_installdeb
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
 
-VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
+override_dh_auto_clean:
+	# distclean moans about MANIFEST, this is quieter
+	if [ -e Makefile ]; then $(MAKE) realclean; fi
 
-# Update the web page. Not intended for use by anyone except the author.
-DIR=/home/web/kitenet.net/programs/alien
-installhook:
-	cp debian/changelog $(DIR)/CHANGES
-	echo -n $(VERSION) > $(DIR)/LATEST-VERSION-IS
-	rm -f $(DIR)/*.tar.gz
-	ln -sf /home/joey/lib/debian/unstable/alien_$(VERSION).tar.gz $(DIR)
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
+# Not intended for use by anyone except the author.
+announcedir:
+	@echo ${HOME}/src/joeywiki/code/alien/news

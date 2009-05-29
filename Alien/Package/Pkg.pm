@@ -118,8 +118,11 @@ sub install {
 	my $pkg=shift;
 
 	if (-x "/usr/sbin/pkgadd") {
+		my $v=$Alien::Package::verbose;
+		$Alien::Package::verbose=2;
 		$this->do("/usr/sbin/pkgadd", "-d .", "$pkg")
 			or die "Unable to install";
+		$Alien::Package::verbose=$v;
 	}
 	else {
 		die "Sorry, I cannot install the generated .pkg file ".
@@ -859,7 +862,7 @@ sub prep {
 #  	  grep {/^\./} readdir DIR;
 #  	closedir DIR;
 
-	$this->do("cd $dir; find . -print | pkgproto > ./prototype")
+	$this->do("cd $dir; find . -print | sed -e '/.\\/prototype\$/d' | pkgproto > ./prototype")
 		|| die "error during pkgproto: $!\n";
 
 	open(PKGPROTO, ">>$dir/prototype")
@@ -925,6 +928,8 @@ sub build {
 	$this->do("mv", "$dir/$name", $name);
 	return $name;
 }
+
+=back
 
 =head1 AUTHOR
 

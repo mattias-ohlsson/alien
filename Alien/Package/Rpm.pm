@@ -53,8 +53,11 @@ sub install {
 	my $this=shift;
 	my $rpm=shift;
 
+	my $v=$Alien::Package::verbose;
+	$Alien::Package::verbose=2;
 	$this->do("rpm -ivh ".(exists $ENV{RPMINSTALLOPT} ? $ENV{RPMINSTALLOPT} : '').$rpm)
 		or die "Unable to install";
+	$Alien::Package::verbose=$v;
 }
 
 =item scan
@@ -75,18 +78,20 @@ sub scan {
 		POSTUN => 'postrm',
 	);
 
-	# These fields need no translation except case.
-	foreach (qw{name version release arch changelogtext summary
-		    description copyright prefixes}) {
-		$fieldtrans{uc $_}=$_;
-	}
-
 	# Use --queryformat to pull out all the fields we need.
-	foreach my $field (keys(%fieldtrans)) {
-		$_=$this->runpipe(0, "LANG=C rpm -qp --queryformat \%{$field} $file");
-		$field=$fieldtrans{$field};
-		$_='' if $_ eq '(none)';
-		$this->$field($_);
+	foreach my $field (qw{NAME VERSION RELEASE ARCH CHANGELOGTEXT
+		              SUMMARY DESCRIPTION COPYRIGHT PREFIXES},
+	                   keys(%fieldtrans)) {
+		my $value=$this->runpipe(0, "LANG=C rpm -qp --queryformat \%{$field} $file");
+		my $key;
+		if (exists $fieldtrans{$field}) {
+			$key=$fieldtrans{$field};
+		}
+		else {
+			$key=lc($field);
+		}
+		$value='' if $value eq '(none)';
+		$this->$key($value);
 	}
 
 	# Get the conffiles list.
@@ -182,30 +187,45 @@ sub unpack {
 	#
 	# Test to see if the package contains the prefix directory already.
 	if (defined $this->prefixes && ! -e "$workdir/".$this->prefixes) {
+		my $relocate=1;
+
 		# Get the files to move.
 		my @filelist=glob("$workdir/*");
-
+		
 		# Now, make the destination directory.
 		my $collect=$workdir;
 		foreach (split m:/:, $this->prefixes) {
 			if ($_ ne '') { # this keeps us from using anything but relative paths.
 				$collect.="/$_";
+				if (-d $collect) {
+					# The package contains a parent
+					# directory of the relocation
+					# directory. Since it's impossible
+					# to move a parent directory into
+					# its child, bail out and do
+					# nothing.
+					$relocate=0;
+					last;
+				}
 				$this->do("mkdir", $collect) || die "unable to mkdir $collect: $!";
 			}
 		}
-		# Now move all files in the package to the directory we made.
-		if (@filelist) {
-			$this->do("mv", @filelist, "$workdir/".$this->prefixes)
-				or die "error moving unpacked files into the default prefix directory: $!";
-		}
 
-		# Deal with relocating conffiles.
-		my @cf;
-		foreach my $cf (@{$this->conffiles}) {
-			$cf=$this->prefixes.$cf;
-			push @cf, $cf;
+		if ($relocate) {
+			# Now move all files in the package to the directory we made.
+			if (@filelist) {
+				$this->do("mv", @filelist, "$workdir/".$this->prefixes)
+					or die "error moving unpacked files into the default prefix directory: $!";
+			}
+	
+			# Deal with relocating conffiles.
+			my @cf;
+			foreach my $cf (@{$this->conffiles}) {
+				$cf=$this->prefixes.$cf;
+				push @cf, $cf;
+			}
+			$this->conffiles([@cf]);
 		}
-		$this->conffiles([@cf]);
 	}
 	
 	# rpm files have two sets of permissions; the set in the cpio
@@ -443,10 +463,19 @@ debian/slackware scripts can be anything -- perl programs or binary files
 -- and rpm is limited to only shell scripts, we need to encode the files
 and add a scrap of shell script to make it unextract and run on the fly.
 
-When setting a value, we do some mangling too. Rpm maitainer scripts
-are typically shell scripts, but often lack the leading #!/bin/sh
-This can confuse dpkg, so add the #!/bin/sh if it looks like there
+When setting a value, we do some mangling too. Rpm maintainer scripts
+are typically shell scripts, but often lack the leading shebang line.
+This can confuse dpkg, so add the shebang if it looks like there
 is no shebang magic already in place.
+
+Additionally, it's not uncommon for rpm maintainer scripts to contain
+bashisms, which can be triggered when they are ran on systems where /bin/sh
+is not bash. To work around this, the shebang line of the scripts is
+changed to use bash.
+
+Also, if the rpm is relocatable, the script could refer to
+RPM_INSTALL_PREFIX, which is set by rpm at run time. Deal with this by
+adding code to the script to set RPM_INSTALL_PREFIX.
 
 =cut
 
@@ -457,9 +486,19 @@ sub _script_helper {
 
 	# set
 	if (@_) {
+		my $prefixcode="";
+		if (defined $this->prefixes) {
+			$prefixcode="RPM_INSTALL_PREFIX=".$this->prefixes."\n";
+			$prefixcode.="export RPM_INSTALL_PREFIX\n";
+		}
+
 		my $value=shift;
 		if (length $value and $value !~ m/^#!\s*\//) {
-			$value="#!/bin/sh\n$value";
+			$value="#!/bin/bash\n$prefixcode$value";
+		}
+		else {
+			$value=~s@^#!\s*/bin/sh(\s)@#/bin/bash$1@;
+			$value=~s/\n/\n$prefixcode/s;
 		}
 		$this->{$script} = $value;
 	}

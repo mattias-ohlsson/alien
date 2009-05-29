@@ -18,10 +18,6 @@ package format and install it. It also supports LSB packages.
 
 =head1 WARNING
 
-Despite the high version number, B<alien> is still (and will probably always
-be) rather experimental software. It's been under development for many
-years now, but there are still many bugs and limitations.
-
 B<alien> should not be used to replace important system packages, like
 init, libc, or other things that are essential for the functioning of
 your system. Many of these packages are set up differently by the
@@ -53,6 +49,9 @@ and B<alien> will use by preference a program named lsb-rpm, if it exists.
 No guarantees are made that the generated lsb packages will be fully LSB
 compliant, and it's rather unlikely they will unless you build them in the
 lsbdev environment.
+
+Note that unlike other package formats, converting an LSB package to
+another format will not cause its minor version number to be changed.
 
 =item deb
 
@@ -138,7 +137,7 @@ built.
 
 Be less strict about which patch file is used, perhaps attempting to use a patch
 file for an older verson of the package. This is not guaranteed to always work;
-older patches may necessarily not work with newer packages.
+older patches may not necessarily work with newer packages.
 
 =item B<--nopatch>
 
@@ -160,7 +159,7 @@ Note that without an argument, this displays the version of B<alien> instead.
 =item B<-c>, B<--scripts>
 
 Try to convert the scripts that are meant to be run when the
-package is installed and removed. Use this with caution, becuase these
+package is installed and removed. Use this with caution, because these
 scripts might be designed to work on a system unlike your own, and could
 cause problems. It is recommended that you examine the scripts by hand
 and check to see what they do before using this option.
@@ -469,9 +468,7 @@ foreach my $file (@ARGV) {
 
 	# Increment release.
 	unless (defined $keepversion) {
-		$^W=0; # Shut of possible "is not numeric" warning.
-		$package->release($package->release + $versionbump);
-		$^W=1; # Re-enable warnings.
+		$package->incrementrelease($versionbump);
 	}
 	
 	foreach my $format (keys %destformats) {

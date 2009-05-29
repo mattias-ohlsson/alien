@@ -1,3 +1,93 @@
+alien (8.75) unstable; urgency=low
+
+  * Simplified rules file.
+  * Modify maintainer scripts from rpm files to use /bin/bash rather
+    than /bin/sh. Many such scripts are only tested on systems where /bin/sh
+    is bash, and contain bashisms, which can cause trouble when converting
+    the rpm to be used on eg, the Debian family of distributions, where
+    /bin/sh can legitimatly be dash. Closes: #495971
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 06 May 2009 17:22:02 -0400
+
+alien (8.74) unstable; urgency=low
+
+  * Support bzipped and uncompressed tar files, using tar's auto-compression
+    detection. (Requires gnu tar 1.14.91)
+  * pod fixes
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 15 Feb 2009 19:51:54 -0500
+
+alien (8.73) unstable; urgency=low
+
+  * Fix pkg generation to not include /prototype in all packages.
+    (Kim Bisgaard)
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 26 Oct 2008 23:43:47 -0400
+
+alien (8.72) unstable; urgency=low
+
+  * Use debhelper 7, rules file minimisation.
+  * Improve parsing of tgz filenames, to avoid confusion when the filename
+    includes the package type (ie, "noarch"). Patch from Andrej Ricnik-Bay.
+  * When generating a debian changelog file, work around bug #478925 by
+    including the alien changelog text inside the debian changelog entry.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 01 May 2008 15:40:34 -0400
+
+alien (8.71) unstable; urgency=low
+
+  * Deal with rpms that relocate ie, /usr into /usr/local, and don't
+    try to move /usr into /usr/local in this case. Closes: #470905
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 14 Mar 2008 13:35:33 -0400
+
+alien (8.70) unstable; urgency=low
+
+  * Extract prefixes field before extracting scripts so that
+    RPM_INSTALL_PREFIX gets set.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 12 Mar 2008 11:05:40 -0400
+
+alien (8.69) unstable; urgency=low
+
+  * Alien's repository has moved from subversion to git.
+  * Minor improvement to debian/rules clean.
+  * Improve the short description.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 19 Oct 2007 20:27:53 -0400
+
+alien (8.68) unstable; urgency=low
+
+  * Show output of installation of package with -i, since some packages
+    install scripts may have important output or even be interactive.
+    Closes: #425732
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 24 May 2007 14:08:39 -0400
+
+alien (8.67) unstable; urgency=low
+
+  * Update the url to the web page, and remove several other broken urls from
+    the README.
+  * Correct a bug that caused alien to ignore failing commands. Closes: #424858
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 17 May 2007 13:34:36 -0400
+
+alien (8.66) unstable; urgency=low
+
+  * Use date -R as 822-date will soon be deprecated.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 22 Mar 2007 17:45:24 -0400
+
+alien (8.65) unstable; urgency=low
+
+  * Fix alien's own spec file, s/Copyright/License/.
+  * Add support for rpm scripts that use RPM_INSTALL_PREFIX, by setting
+    RPM_INSTALL_PREFIX as part of the converted script. Closes: #400863
+  * When converting LSB packages, do not increment the release number.
+  * Use rpmbuild to build lsb packages, not rpm, if lsb-rpm is not available.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 15 Dec 2006 13:46:38 -0500
+
 alien (8.73.5) elatte; urgency=low
 
   * rpm deps disabled for now
