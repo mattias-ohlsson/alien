@@ -424,7 +424,7 @@ sub build {
 		$opts="--buildarch ".$this->arch;
 	}
 	else {
-		# Presumably we're delaing with rpm 3.0 or above, which
+		# Presumably we're dealing with rpm 3.0 or above, which
 		# doesn't output rpmdir in any format I'd care to try to
 		# parse. Instead, rpm is now of a late enough version to
 		# notice the %define's in the spec file, that will make the
