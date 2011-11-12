@@ -1,9 +1,9 @@
-alien (8.86) UNRELEASED; urgency=low
+alien (8.86) unstable; urgency=low
 
   * Filter out illegal characters in version number when building a deb.
     Closes: #648531
 
- -- Joey Hess <joeyh@debian.org>  Sat, 12 Nov 2011 13:08:40 -0400
+ -- Joey Hess <joeyh@debian.org>  Sat, 12 Nov 2011 13:12:35 -0400
 
 alien (8.85) unstable; urgency=low
 
