@@ -1,3 +1,10 @@
+alien (8.86) UNRELEASED; urgency=low
+
+  * Filter out illegal characters in version number when building a deb.
+    Closes: #648531
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 12 Nov 2011 13:08:40 -0400
+
 alien (8.85) unstable; urgency=low
 
   * Avoid breaking on spaces in filenames. Closes: #618636

@@ -596,6 +596,8 @@ sub version {
 	# get
 	return unless defined wantarray; # optimization
 	$_=$this->{version};
+	# filter out some characters not allowed in debian versions
+	s/[^-.+~:A-Za-z0-9]//g; # see lib/dpkg/parsehelp.c parseversion
 	# Make sure the version contains digets.
 	unless (/[0-9]/) {
 		# Drat. Well, add some. dpkg-deb won't work
