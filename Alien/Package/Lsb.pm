@@ -96,8 +96,8 @@ sub revert {
 
 =item build
 
-Uses the parent's build method. If a lsb-rpm is available, uses it to build
-the package.
+Uses the parent's build method. If a lsb-rpmbuild is available, uses it to
+build the package.
 
 =cut
 
@@ -105,8 +105,8 @@ sub build {
 	my $this=shift;
 	my $buildcmd=shift || 'rpmbuild';
 	foreach (split(/:/,$ENV{PATH})) {
-		if (-x "$_/lsb-rpm") {
-			$buildcmd='lsb-rpm';
+		if (-x "$_/lsb-rpmbuild") {
+			$buildcmd='lsb-rpmbuild';
 			last;
 		}
 	}
