@@ -1,6 +1,8 @@
 alien (8.87) UNRELEASED; urgency=low
 
   * Use lsb-rpmbuild, not lsb-rpm. Closes: #667044
+  * Fix adding of postinst script to deb, containing rpm permissions
+    fixups code. Closes: #667651
 
  -- Joey Hess <joeyh@debian.org>  Wed, 04 Apr 2012 13:34:26 -0400
 

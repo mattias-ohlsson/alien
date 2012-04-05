@@ -443,17 +443,15 @@ EOF
 	close OUT;
 	$this->do("chmod", 755, "$dir/debian/rules");
 
-	# Save any scripts.
 	if ($this->usescripts) {
 		foreach my $script (qw{postinst postrm preinst prerm}) {
-			my $data=$this->$script();
-			next unless defined $data;
-			next if $data =~ m/^\s*$/;
-			open (OUT,">$dir/debian/$script") ||
-				die "$dir/debian/$script: $!";
-			print OUT $data;
-			close OUT;
-		}	
+			$this->savescript($script, $this->$script());
+		}
+	}
+	else {
+		# There may be a postinst with permissions fixups even when
+		# scripts are disabled.
+		$this->savescript("postinst", undef);
 	}
 	
 	my %dirtrans=( # Note: no trailing slashes on these directory names!
@@ -729,29 +727,49 @@ sub username {
 	return $username;
 }
 
-=item postinst
+=item savescript
 
-Returns the postinst. This may include generated shell code to set owners
-and groups from the owninfo field, and update modes from the modeinfo field.
+Saves script to debian directory.
 
 =cut
 
-sub postinst {
+sub savescript {
 	my $this=shift;
+	my $script=shift;
+	my $data=shift;
 
-	if (@_) {
-		$this->{postinst}=shift;
+	if ($script eq 'postinst') {
+		$data=$this->gen_postinst($data);
 	}
-	
+
+	my $dir=$this->unpacked_tree;
+
+	return unless defined $data;
+	next if $data =~ m/^\s*$/;
+	open (OUT,">$dir/debian/$script") ||
+		die "$dir/debian/$script: $!";
+	print OUT $data;
+	close OUT;
+}
+
+=item gen_postinst
+
+Modifies or creates a postinst. This may include generated shell code to set
+owners and groups from the owninfo field, and update modes from the modeinfo
+field.
+
+=cut
+
+sub gen_postinst {
+	my $this=shift;
+	my $postinst=shift;
+
 	my $owninfo = $this->owninfo;
 	my $modeinfo = $this->modeinfo;
-	my $postinst = $this->{postinst};
-	return $postinst unless ref $owninfo;
+	return $postinst unless ref $owninfo && %$owninfo;
 
 	# If there is no postinst, let's make one up..
 	$postinst="#!/bin/sh\n" unless defined $postinst && length $postinst;
-	
-	return $postinst unless %$owninfo;
 	
 	my ($firstline, $rest)=split(/\n/, $postinst, 2);
 	if ($firstline !~ m/^#!\s*\/bin\/(ba)?sh/) {
