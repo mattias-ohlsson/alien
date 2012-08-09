@@ -1,3 +1,10 @@
+alien (8.88) UNRELEASED; urgency=low
+
+  * Ensure that version numbers begin with well, a number, when building a
+    deb, otherwise dpkg-deb will refuse to build it.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 09 Aug 2012 14:13:16 -0400
+
 alien (8.87) unstable; urgency=low
 
   * Use lsb-rpmbuild, not lsb-rpm. Closes: #667044
