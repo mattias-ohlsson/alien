@@ -1,3 +1,9 @@
+alien (8.89) UNRELEASED; urgency=low
+
+  * Correct man page to say RPMBUILDOPT (not RPMBUILDOPTS). Closes: #701106
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 21 Feb 2013 17:04:45 -0400
+
 alien (8.88) unstable; urgency=low
 
   * Ensure that version numbers begin with well, a number, when building a
