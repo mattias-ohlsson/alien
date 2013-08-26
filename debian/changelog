@@ -1,10 +1,10 @@
-alien (8.89) UNRELEASED; urgency=low
+alien (8.89) unstable; urgency=low
 
   * Correct man page to say RPMBUILDOPT (not RPMBUILDOPTS). Closes: #701106
   * Handle whitespace in path to RPMs. Closes: #719776
     (Thanks, Christopher Huhn)
 
- -- Joey Hess <joeyh@debian.org>  Thu, 21 Feb 2013 17:04:45 -0400
+ -- Joey Hess <joeyh@debian.org>  Thu, 22 Aug 2013 21:53:44 -0400
 
 alien (8.88) unstable; urgency=low
 
