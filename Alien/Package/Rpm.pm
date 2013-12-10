@@ -607,6 +607,10 @@ sub arch {
 			# Treat armv4l as arm.
 			$arch='arm';
 		}
+		elsif ($arch eq 'armv7l') {
+			# Treat armv7l as armel.
+			$arch='armel';
+		}
 		elsif ($arch eq 'parisc') {
 			$arch='hppa';
 		}
