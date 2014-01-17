@@ -193,6 +193,10 @@ some things to mess with their permissions and owners to the degree this does,
 so it defaults to off. This can only be used when converting to debian
 packages.
 
+=item B<--target=>I<architecture>
+
+Force the architecture of the generated package to the given string.
+
 =item B<-v>, B<--verbose>
 
 Be verbose: Display each command B<alien> runs in the process of converting a
@@ -330,6 +334,7 @@ Usage: alien [options] file [...]
   -i, --install             Install generated package.
   -g, --generate            Generate build tree, but do not build package.
   -c, --scripts             Include scripts in package.
+      --target=<arch>       Set architecture of the generated package.
   -v, --verbose             Display each command alien runs.
       --veryverbose         Be verbose, and also display output of run commands.
   -k, --keep-version        Do not change version of generated package.
@@ -344,7 +349,7 @@ EOF
 # Start by processing the parameters.
 my (%destformats, $generate, $install, $single, $scripts, $patchfile,
     $nopatch, $tgzdescription, $tgzversion, $keepversion, $fixperms,
-    $test, $anypatch);
+    $test, $anypatch, $target);
 my $versionbump=1;
 
 # Bundling is nice anyway, and it is required or Getopt::Long will confuse
@@ -366,6 +371,7 @@ GetOptions(
 	"patch=s"        => \$patchfile,
 	"nopatch"        => \$nopatch,
 	"anypatch"       => \$anypatch,
+	"target=s"       => \$target,
 	"description=s"  => \$tgzdescription,
 	"V"              => \&version,
         "version:s"      => sub { length $_[1] ? $tgzversion=$_[1] : version() },
@@ -444,6 +450,10 @@ foreach my $file (@ARGV) {
 	}
 	else {
 		die "Unknown type of package, $file.\n";
+	}
+
+	if ($target) {
+		$package->arch($target);
 	}
 
 	if (! $package->usescripts && $package->scripts) {
