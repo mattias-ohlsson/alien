@@ -1,3 +1,10 @@
+alien (8.90) UNRELEASED; urgency=medium
+
+  * Add --target=<arch> option for setting architecture. Closes: #260948
+    (Thanks, Teemu Ikonen)
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 17 Jan 2014 14:05:06 -0400
+
 alien (8.89) unstable; urgency=low
 
   * Correct man page to say RPMBUILDOPT (not RPMBUILDOPTS). Closes: #701106
