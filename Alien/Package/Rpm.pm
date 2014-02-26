@@ -614,6 +614,9 @@ sub arch {
 		elsif ($arch eq 'parisc') {
 			$arch='hppa';
 		}
+		elsif ($arch eq 'ppc64le') {
+			$arch='ppc64el';
+		}
 		
 		$this->{arch}=$arch;
 	}
@@ -632,6 +635,9 @@ sub arch {
 	}
 	elsif ($arch eq 'all') {
 		$arch='noarch';
+	}
+	elsif ($arch eq 'ppc64el') {
+		$arch='ppc64le';
 	}
 
 	return $arch

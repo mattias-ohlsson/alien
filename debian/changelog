@@ -2,6 +2,7 @@ alien (8.90) UNRELEASED; urgency=medium
 
   * Add --target=<arch> option for setting architecture. Closes: #260948
     (Thanks, Teemu Ikonen)
+  * Add conversion from ppc64le (rpm) to ppc64el (deb).
 
  -- Joey Hess <joeyh@debian.org>  Fri, 17 Jan 2014 14:05:06 -0400
 
