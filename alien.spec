@@ -1,7 +1,7 @@
 Summary: Install Debian, Slackware, and Stampede packages with rpm.
 Name: alien
 Packager: Joey Hess <joey@kitenet.net>
-Version: 8.89
+Version: 8.90
 Release: 1
 Source: ftp://kitenet.net/pub/code/debian/alien_8.89.tar.gz
 License: GPL

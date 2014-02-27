@@ -1,6 +1,6 @@
 Begin3
 Title:		alien
-Version:	8.89
+Version:	8.90
 Entered-date:	31MAR97
 Description:	Alien converts Slackware .tgz packages, Red Hat .rpm packages,
                 Debian .deb packages, and Stampede .slp packages. It can 
