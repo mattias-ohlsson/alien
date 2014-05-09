@@ -9,6 +9,7 @@ Alien::Package::Deb - an object that represents a deb package
 package Alien::Package::Deb;
 use strict;
 use base qw(Alien::Package);
+use List::Util qw(first);
 
 =head1 DESCRIPTION
 
@@ -22,6 +23,10 @@ Alien::Package.
 =item have_dpkg_deb
 
 Set to a true value if dpkg-deb is available. 
+
+=item deb_member_list
+
+Set to the list of member names in the deb package.
 
 =item dirtrans
 
@@ -117,6 +122,26 @@ sub test {
 	}
 }
 
+=item get_deb_member_list
+
+Helper method. Pass it the name of the deb and it will return the list of
+ar members.
+
+=cut
+
+sub get_deb_member_list {
+	my $this=shift;
+	my $file=$this->filename;
+	my $members=$this->deb_member_list;
+
+	unless (defined $members) {
+		$members = [ map { chomp; $_ } $this->runpipe(1, "ar -t '$file'") ];
+		$this->deb_member_list($members);
+	}
+
+	return @{$members};
+}
+
 =item getcontrolfile
 
 Helper method. Pass it the name of a control file, and it will pull it out
@@ -142,9 +167,56 @@ sub getcontrolfile {
 				" tar xf - './$file' &&".
 				" cat '$file'; cd /; rm -rf /tmp/tar_out.$$)";
 		}
-		my $getcontrol = "ar -p '$file' control.tar.gz | gzip -dc | ".tar_out($controlfile)." 2>/dev/null";
+		my $controlcomp;
+		my $controlmember = first { /^control\.tar/ }
+				    $this->get_deb_member_list;
+		if (! defined $controlmember) {
+			die 'Cannot find control member!';
+		} elsif ($controlmember eq 'control.tar.gz') {
+			$controlcomp = 'gzip -dc';
+		} elsif ($controlmember eq 'control.tar.xz') {
+			$controlcomp = 'xz -dc';
+		} elsif ($controlmember eq 'control.tar') {
+			$controlcomp = 'cat';
+		} else {
+			die 'Unknown control member!';
+		}
+		my $getcontrol = "ar -p '$file' $controlmember | $controlcomp | ".tar_out($controlfile)." 2>/dev/null";
 		return $this->runpipe(1, $getcontrol);
 	}
+}
+
+=item get_datamember_cmd
+
+Helper method. Pass it the name of the deb and it will return the raw
+command needed to extract the data.tar member.
+
+=cut
+
+sub get_datamember_cmd {
+	my $this=shift;
+	my $file=$this->filename;
+
+	my $datacomp;
+	my $datamember = first { /^data\.tar/ }
+			 $this->get_deb_member_list;
+	if (! defined $datamember) {
+		die 'Cannot find data member!';
+	} elsif ($datamember eq 'data.tar.gz') {
+		$datacomp = 'gzip -dc';
+	} elsif ($datamember eq 'data.tar.bz2') {
+		$datacomp = 'bzip2 -dc';
+	} elsif ($datamember eq 'data.tar.xz') {
+		$datacomp = 'xz -dc';
+	} elsif ($datamember eq 'data.tar.lzma') {
+		$datacomp = 'xz -dc';
+	} elsif ($datamember eq 'data.tar') {
+		$datacomp = 'cat';
+	} else {
+		die 'Unknown data member!';
+	}
+
+	return "ar -p '$file' $datamember | $datacomp";
 }
 
 =item scan
@@ -209,15 +281,15 @@ sub scan {
 
 	# Read in the list of all files.
 	# Note that tar doesn't supply a leading '/', so we have to add that.
-	my @filelist;
+	my $datamember_cmd;
 	if ($this->have_dpkg_deb) {
-		@filelist=map { chomp; s:\./::; "/$_" }
-			  $this->runpipe(0, "dpkg-deb --fsys-tarfile '$file' | tar tf -");
+		$datamember_cmd = "dpkg-deb --fsys-tarfile '$file'";
 	}
 	else {
-		@filelist=map { chomp; s:\./::; "/$_" }
-			  $this->runpipe(0, "ar -p '$file' data.tar.gz | gzip -dc | tar tf -");
+		$datamember_cmd = $this->get_datamember_cmd($file);
 	}
+	my @filelist=map { chomp; s:\./::; "/$_" }
+		     $this->runpipe(0, "$datamember_cmd | tar tf -");
 	$this->filelist(\@filelist);
 
 	# Read in the scripts, if any.
@@ -244,7 +316,9 @@ sub unpack {
 			or die "Unpacking of '$file' failed: $!";
 	}
 	else {
-		$this->do("ar -p $file data.tar.gz | gzip -dc | (cd ".$this->unpacked_tree."; tar xpf -)")
+		my $datamember_cmd = $this->get_datamember_cmd($file);
+
+		$this->do("$datamember_cmd | (cd ".$this->unpacked_tree."; tar xpf -)")
 			or die "Unpacking of '$file' failed: $!";
 	}
 
