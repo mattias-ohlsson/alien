@@ -1,10 +1,10 @@
-alien (8.91) UNRELEASED; urgency=medium
+alien (8.91) unstable; urgency=medium
 
   * Support other deb data.tar compression schemes in fallback code.
     Closes: #718364
     Thanks, Guillem Jover
 
- -- Joey Hess <joeyh@debian.org>  Sun, 18 May 2014 12:20:20 -0400
+ -- Joey Hess <joeyh@debian.org>  Fri, 13 Jun 2014 12:03:54 -0400
 
 alien (8.90) unstable; urgency=medium
 
