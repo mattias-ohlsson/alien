@@ -1,9 +1,9 @@
-alien (8.92) UNRELEASED; urgency=medium
+alien (8.92) unstable; urgency=medium
 
   * Remove suggests for lsb-rpm, which no longer exists.
     Closes: #756873
 
- -- Joey Hess <joeyh@debian.org>  Sat, 02 Aug 2014 19:19:55 -0400
+ -- Joey Hess <joeyh@debian.org>  Sun, 31 Aug 2014 14:16:23 -0700
 
 alien (8.91) unstable; urgency=medium
 
