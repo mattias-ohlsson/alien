@@ -1,3 +1,9 @@
+alien (8.93) unstable; urgency=medium
+
+  * Alien needs a new maintainer, both in Debian and upstream.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 07 Nov 2014 17:25:47 -0400
+
 alien (8.92) unstable; urgency=medium
 
   * Remove suggests for lsb-rpm, which no longer exists.
