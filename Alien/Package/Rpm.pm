@@ -9,6 +9,7 @@ Alien::Package::Rpm - an object that represents a rpm package
 package Alien::Package::Rpm;
 use strict;
 use base qw(Alien::Package);
+use File::Which qw(which);
 
 =head1 DESCRIPTION
 
@@ -158,33 +159,40 @@ sub unpack {
 	my $this=shift;
 	$this->SUPER::unpack(@_);
 	my $workdir=$this->unpacked_tree;
-	
-	# Check if we need to use lzma to uncompress the cpio archive
-	my $decomp='';
-	if ($this->do("rpm2cpio '".$this->filename."' | lzma -t -q > /dev/null 2>&1")) {
-		$decomp = 'lzma -d -q |';
-	}
 
-	$this->do("rpm2cpio '".$this->filename."' | (cd $workdir; $decomp cpio --extract --make-directories --no-absolute-filenames --preserve-modification-time) 2>&1")
-		or die "Unpacking of '".$this->filename."' failed";
-	
-	# cpio does not necessarily store all parent directories in an
-	# archive, and so some directories, if it has to make them and has
-	# no permission info, will come out with some random permissions.
-	# Find those directories and make them mode 755, which is more
-	# reasonable.
-	my %seenfiles;
-	open (RPMLIST, "rpm2cpio '".$this->filename."' | $decomp cpio -it --quiet |")
-		or die "File list of '".$this->filename."' failed";
-	while (<RPMLIST>) {
-		chomp;
-		$seenfiles{$_}=1;
-	}
-	close RPMLIST;
-	foreach my $file (`cd $workdir; find ./`) {
-		chomp $file;
-		if (! $seenfiles{$file} && -d "$workdir/$file" && ! -l "$workdir/$file") {
-			$this->do("chmod 755 '$workdir/$file'");
+	# Check if we can use rpm2archive instead of rpm2cpio
+	if (which("rpm2archive")) {
+		$this->do("rpm2archive < '".$this->filename."' | (cd $workdir; tar xz) 2>&1")
+			or die "Unpacking of '".$this->filename."' failed";
+	} else {
+
+		# Check if we need to use lzma to uncompress the cpio archive
+		my $decomp='';
+		if ($this->do("rpm2cpio '".$this->filename."' | lzma -t -q > /dev/null 2>&1")) {
+			$decomp = 'lzma -d -q |';
+		}
+
+		$this->do("rpm2cpio '".$this->filename."' | (cd $workdir; $decomp cpio --extract --make-directories --no-absolute-filenames --preserve-modification-time) 2>&1")
+			or die "Unpacking of '".$this->filename."' failed";
+
+		# cpio does not necessarily store all parent directories in an
+		# archive, and so some directories, if it has to make them and has
+		# no permission info, will come out with some random permissions.
+		# Find those directories and make them mode 755, which is more
+		# reasonable.
+		my %seenfiles;
+		open (RPMLIST, "rpm2cpio '".$this->filename."' | $decomp cpio -it --quiet |")
+			or die "File list of '".$this->filename."' failed";
+		while (<RPMLIST>) {
+			chomp;
+			$seenfiles{$_}=1;
+		}
+		close RPMLIST;
+		foreach my $file (`cd $workdir; find ./`) {
+			chomp $file;
+			if (! $seenfiles{$file} && -d "$workdir/$file" && ! -l "$workdir/$file") {
+				$this->do("chmod 755 '$workdir/$file'");
+			}
 		}
 	}
 
